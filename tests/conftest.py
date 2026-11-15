@@ -1,11 +1,17 @@
-from app.models.entities import Doctor
+import os
 import pytest
 
+os.environ.setdefault(
+    "JWT_SECRET_KEY",
+    "test-only-secret-key-for-automated-tests"
+)
+os.environ.setdefault("APP_ENV", "test")
+
+from app.models.entities import Doctor
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-
 from app.main import app
 from app.db.database import Base, get_db
 
