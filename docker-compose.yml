@@ -1,0 +1,59 @@
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: hospital_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hospital
+      POSTGRES_USER: hospital_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hospital_user -d hospital"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hospital_network
+
+  api:
+    build: .
+    container_name: hospital_api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://hospital_user:${POSTGRES_PASSWORD}@db:5432/hospital
+    expose:
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - hospital_network
+
+
+  nginx:
+    image: nginx:alpine
+    container_name: hospital_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - api
+    networks:
+      - hospital_network
+
+
+volumes:
+  postgres_data:
+
+networks:
+  hospital_network:
+    driver: bridge
