@@ -1,16 +1,16 @@
-
 from sqlalchemy import (
+    Boolean,
     Column,
-    Integer,
-    String,
     DateTime,
     ForeignKey,
-    Text,
     Index,
+    Integer,
+    String,
+    Text,
     text,
-    Boolean
 )
 from sqlalchemy.orm import relationship
+
 from app.db.database import Base
 
 
@@ -21,10 +21,7 @@ class Patient(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(150), unique=True, nullable=False)
 
-    appointments = relationship(
-        "Appointment",
-        back_populates="patient"
-    )
+    appointments = relationship("Appointment", back_populates="patient")
 
 
 class Doctor(Base):
@@ -34,10 +31,7 @@ class Doctor(Base):
     name = Column(String(100), nullable=False)
     specialization = Column(String(100), nullable=False)
 
-    appointments = relationship(
-        "Appointment",
-        back_populates="doctor"
-    )
+    appointments = relationship("Appointment", back_populates="doctor")
 
 
 class Appointment(Base):
@@ -45,30 +39,16 @@ class Appointment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    patient_id = Column(
-        Integer,
-        ForeignKey("patients.id"),
-        nullable=False
-    )
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
 
-    doctor_id = Column(
-        Integer,
-        ForeignKey("doctors.id"),
-        nullable=False
-    )
+    doctor_id = Column(Integer, ForeignKey("doctors.id"), nullable=False)
 
     appointment_time = Column(DateTime, nullable=False)
     status = Column(String(20), default="confirmed", nullable=False)
 
-    patient = relationship(
-        "Patient",
-        back_populates="appointments"
-    )
+    patient = relationship("Patient", back_populates="appointments")
 
-    doctor = relationship(
-        "Doctor",
-        back_populates="appointments"
-    )
+    doctor = relationship("Doctor", back_populates="appointments")
 
 
 # Prevent two active appointments for the same doctor and time.
@@ -78,7 +58,7 @@ Index(
     Appointment.appointment_time,
     unique=True,
     sqlite_where=text("status = 'confirmed'"),
-    postgresql_where=text("status = 'confirmed'")
+    postgresql_where=text("status = 'confirmed'"),
 )
 
 
@@ -98,26 +78,10 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    email = Column(
-        String(150),
-        unique=True,
-        nullable=False,
-        index=True
-    )
+    email = Column(String(150), unique=True, nullable=False, index=True)
 
-    hashed_password = Column(
-        String(255),
-        nullable=False
-    )
+    hashed_password = Column(String(255), nullable=False)
 
-    role = Column(
-        String(20),
-        nullable=False,
-        default="patient"
-    )
+    role = Column(String(20), nullable=False, default="patient")
 
-    is_active = Column(
-        Boolean,
-        default=True,
-        nullable=False
-    )
+    is_active = Column(Boolean, default=True, nullable=False)

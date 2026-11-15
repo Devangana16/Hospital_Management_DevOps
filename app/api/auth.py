@@ -1,46 +1,30 @@
-from app.models.entities import Patient
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
+from app.core.security import create_access_token, hash_password, verify_password
 from app.db.database import get_db
-from app.models.entities import User
-from app.schemas.auth import UserRegister, UserResponse, TokenResponse
-from app.core.security import (
-    hash_password,
-    verify_password,
-    create_access_token
-)
+from app.models.entities import Patient, User
+from app.schemas.auth import TokenResponse, UserRegister, UserResponse
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
 @router.post("/register", response_model=UserResponse)
-def register_user(
-    data: UserRegister,
-    db: Session = Depends(get_db)
-):
-    existing_user = db.query(User).filter(
-        User.email == data.email
-    ).first()
+def register_user(data: UserRegister, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == data.email).first()
 
     if existing_user:
-        raise HTTPException(
-            status_code=409,
-            detail="Email already registered"
-        )
+        raise HTTPException(status_code=409, detail="Email already registered")
 
     user = User(
-        email=data.email,
-        hashed_password=hash_password(data.password),
-        role="patient"
+        email=data.email, hashed_password=hash_password(data.password), role="patient"
     )
 
     try:
         patient = Patient(
-            name=data.email.split("@")[0].replace(".", " ").title(),
-            email=data.email
+            name=data.email.split("@")[0].replace(".", " ").title(), email=data.email
         )
 
         db.add(user)
@@ -57,37 +41,16 @@ def register_user(
 
 @router.post("/login", response_model=TokenResponse)
 def login_user(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
-    user = db.query(User).filter(
-        User.email == form_data.username
-    ).first()
+    user = db.query(User).filter(User.email == form_data.username).first()
 
-    if (
-        not user
-        or not verify_password(
-            form_data.password,
-            user.hashed_password
-        )
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect email or password"
-        )
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
 
     if not user.is_active:
-        raise HTTPException(
-            status_code=403,
-            detail="Account is disabled"
-        )
+        raise HTTPException(status_code=403, detail="Account is disabled")
 
-    token = create_access_token({
-        "sub": str(user.id),
-        "role": user.role
-    })
+    token = create_access_token({"sub": str(user.id), "role": user.role})
 
-    return {
-        "access_token": token,
-        "token_type": "bearer"
-    }
+    return {"access_token": token, "token_type": "bearer"}

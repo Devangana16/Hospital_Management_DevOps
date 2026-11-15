@@ -1,11 +1,7 @@
-
 def test_register_patient(client):
     response = client.post(
         "/api/auth/register",
-        json={
-            "email": "newpatient@example.com",
-            "password": "Patient@12345"
-        }
+        json={"email": "newpatient@example.com", "password": "Patient@12345"},
     )
 
     assert response.status_code == 200
@@ -14,10 +10,7 @@ def test_register_patient(client):
 
 
 def test_duplicate_registration(client):
-    payload = {
-        "email": "duplicate@example.com",
-        "password": "Patient@12345"
-    }
+    payload = {"email": "duplicate@example.com", "password": "Patient@12345"}
 
     client.post("/api/auth/register", json=payload)
     response = client.post("/api/auth/register", json=payload)
@@ -28,18 +21,12 @@ def test_duplicate_registration(client):
 def test_login(client):
     client.post(
         "/api/auth/register",
-        json={
-            "email": "login@example.com",
-            "password": "Patient@12345"
-        }
+        json={"email": "login@example.com", "password": "Patient@12345"},
     )
 
     response = client.post(
         "/api/auth/login",
-        data={
-            "username": "login@example.com",
-            "password": "Patient@12345"
-        }
+        data={"username": "login@example.com", "password": "Patient@12345"},
     )
 
     assert response.status_code == 200

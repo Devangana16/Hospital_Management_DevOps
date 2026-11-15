@@ -1,5 +1,5 @@
+from datetime import UTC, datetime
 
-from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -14,7 +14,7 @@ class AppointmentCreate(BaseModel):
         if value.tzinfo is None:
             raise ValueError("Appointment time must include a timezone")
 
-        if value <= datetime.now(timezone.utc):
+        if value <= datetime.now(UTC):
             raise ValueError("Appointment must be in the future")
 
         return value
@@ -29,7 +29,7 @@ class AppointmentReschedule(BaseModel):
         if value.tzinfo is None:
             raise ValueError("Appointment time must include a timezone")
 
-        if value <= datetime.now(timezone.utc):
+        if value <= datetime.now(UTC):
             raise ValueError("Appointment must be in the future")
 
         return value

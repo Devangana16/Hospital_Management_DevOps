@@ -1,6 +1,5 @@
-
-from app.db.database import Base, engine, SessionLocal
-from app.models.entities import Patient, Doctor
+from app.db.database import Base, SessionLocal, engine
+from app.models.entities import Doctor, Patient
 
 
 def initialize_database():
@@ -13,18 +12,9 @@ def initialize_database():
         # Insert synthetic patients if none exist
         if db.query(Patient).count() == 0:
             patients = [
-                Patient(
-                    name="Aarav Sharma",
-                    email="aarav@example.test"
-                ),
-                Patient(
-                    name="Meera Singh",
-                    email="meera@example.test"
-                ),
-                Patient(
-                    name="Rohan Verma",
-                    email="rohan@example.test"
-                )
+                Patient(name="Aarav Sharma", email="aarav@example.test"),
+                Patient(name="Meera Singh", email="meera@example.test"),
+                Patient(name="Rohan Verma", email="rohan@example.test"),
             ]
 
             db.add_all(patients)
@@ -32,18 +22,9 @@ def initialize_database():
         # Insert doctors if none exist
         if db.query(Doctor).count() == 0:
             doctors = [
-                Doctor(
-                    name="Dr. Ananya Gupta",
-                    specialization="Cardiology"
-                ),
-                Doctor(
-                    name="Dr. Rahul Mehta",
-                    specialization="Neurology"
-                ),
-                Doctor(
-                    name="Dr. Priya Kapoor",
-                    specialization="Dermatology"
-                )
+                Doctor(name="Dr. Ananya Gupta", specialization="Cardiology"),
+                Doctor(name="Dr. Rahul Mehta", specialization="Neurology"),
+                Doctor(name="Dr. Priya Kapoor", specialization="Dermatology"),
             ]
 
             db.add_all(doctors)
