@@ -11,6 +11,11 @@ jobs:
   test-and-build:
     runs-on: ubuntu-latest
 
+    env:
+      JWT_SECRET_KEY: "ci-only-test-secret-not-for-production"
+      APP_ENV: test
+      DATABASE_URL: "sqlite:///./test_hospital.db"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
