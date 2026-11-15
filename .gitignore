@@ -42,7 +42,12 @@ dist/
 
 # Local databases
 *.db
+*.sqlite
+*.sqlite3
 
 # HTTPS certificates and private keys
 nginx/certs/
 *.key
+
+# Database backups
+backups/
